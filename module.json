@@ -1,0 +1,13 @@
+{
+    "name": "Icons",
+    "alias": "icons",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Icons\\Providers\\IconsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
