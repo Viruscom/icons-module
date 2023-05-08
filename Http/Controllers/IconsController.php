@@ -4,6 +4,7 @@ namespace Modules\Icons\Http\Controllers;
 
 use App\Actions\CommonControllerAction;
 use App\Helpers\AdminHelper;
+use App\Helpers\FileDimensionHelper;
 use App\Helpers\LanguageHelper;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -96,8 +97,11 @@ class IconsController extends Controller
             return redirect()->back()->withErrors(['icons::admin.icons.page_not_found']);
         }
 
-        $catalog = $action->doSimpleCreate(Icon::class, $request);
-        $catalog->storeAndAddNew($request);
+        if ($request->has('image')) {
+            $request->validate(['image' => FileDimensionHelper::getRules('Icons', 1)], FileDimensionHelper::messages('Icons', 1));
+        }
+        $icon = $action->doSimpleCreate(Icon::class, $request);
+        $icon->storeAndAddNew($request);
 
         return redirect()->route('admin.icons.manage.load-icons', ['path' => $request->path])->with('success-message', trans('admin.common.successful_create'));
     }

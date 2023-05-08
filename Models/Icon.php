@@ -153,6 +153,10 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
             $data['filename'] = $request->filename;
         }
 
+        if ($request->hasFile('image')) {
+            $data['filename'] = pathinfo(CommonActions::getValidFilenameStatic($request->image->getClientOriginalName()), PATHINFO_FILENAME) . '.' . $request->image->getClientOriginalExtension();
+        }
+
         return $data;
     }
     public static function generatePosition($request): int
