@@ -57,36 +57,49 @@ class IconsController extends Controller
     }
 
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Renderable
-     */
-    public function create()
+    public function create($path)
     {
-        return view('icons::admin.icons.create', [
-            'languages'     => LanguageHelper::getActiveLanguages(),
-            'fileRulesInfo' => Icon::getUserInfoMessage()
-        ]);
+        $pathHash = $path;
+        if ($pathHash == null) {
+            return back()->withErrors([trans('icons::admin.icons.page_not_found')]);
+        }
+        $splitPath = explode("-", decrypt($pathHash));
+
+        $modelClass = $splitPath[1];
+        if (!class_exists($modelClass)) {
+            return back()->withErrors([trans('icons::admin.icons.page_not_found')]);
+        } else {
+            $modelInstance = new $modelClass;
+            $modelConstant = get_class($modelInstance) . '::ALLOW_ICONS';
+            if (!defined($modelConstant) || !constant($modelConstant)) {
+                return back()->withErrors([trans('icons::admin.icons.icons_not_allowed')]);
+            }
+
+            $model = $modelClass::where('id', $splitPath[2])->first();
+            if (is_null($model)) {
+                return back()->withErrors([trans('icons::admin.icons.page_not_found')]);
+            }
+
+            return view('icons::admin.icons.create', [
+                'languages'     => LanguageHelper::getActiveLanguages(),
+                'fileRulesInfo' => Icon::getUserInfoMessage(),
+                'path'          => $pathHash,
+            ]);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     *
-     * @return Renderable
-     */
     public function store(Request $request, CommonControllerAction $action)
     {
         $splitPath  = explode("-", decrypt($request->path));
         $modelClass = $splitPath[1];
         if (!class_exists($modelClass)) {
-            return redirect()->back()->withErrors(['icons::admin.icons.warning_class_not_found']);
+            return redirect()->back()->withErrors(['icons::admin.icons.page_not_found']);
         }
 
         $catalog = $action->doSimpleCreate(Icon::class, $request);
         $catalog->storeAndAddNew($request);
+
+        return redirect()->route('admin.icons.manage.load-icons', ['path' => $request->path])->with('success-message', trans('admin.common.successful_create'));
     }
 
     /**

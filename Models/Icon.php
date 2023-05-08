@@ -26,13 +26,13 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
     use Translatable, StorageActions, Scopes, CommonActions;
 
     public const FILES_PATH                           = "icons";
-    const        ICONS_AFTER_DESCRIPTION              = "iconsAfterDescription";
-    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_1 = "iconsAfterAdditionalDescription_1";
-    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_2 = "iconsAfterAdditionalDescription_2";
-    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_3 = "iconsAfterAdditionalDescription_3";
-    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_4 = "iconsAfterAdditionalDescription_4";
-    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_5 = "iconsAfterAdditionalDescription_5";
-    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_6 = "iconsAfterAdditionalDescription_6";
+    const        ICONS_AFTER_DESCRIPTION              = 0;
+    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_1 = 1;
+    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_2 = 2;
+    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_3 = 3;
+    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_4 = 4;
+    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_5 = 5;
+    const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_6 = 6;
 
     public static string $ICON_SYSTEM_IMAGE  = 'icon_img.png';
     public static string $ICON_RATIO         = '1/1';
@@ -44,7 +44,7 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
 
     public array $translatedAttributes = ['short_description'];
     protected    $table                = "icons";
-    protected    $fillable             = ['parent_type_id', 'parent_id', 'icon_set_id', 'active', 'main_position', 'position', 'creator_user_id', 'filename'];
+    protected    $fillable             = ['module', 'model', 'model_id', 'icon_set_id', 'active', 'main_position', 'position', 'filename'];
     public static function getCollections($parentModel): array
     {
         return [
@@ -62,7 +62,7 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
     {
         return Icon::where('model', get_class($parentModel))
             ->where('model_id', $parentModel->id)
-            ->where('main_position', $mainPosition)->with('translations', 'parent', 'parent.translations')->orderBy('position')->get();
+            ->where('main_position', $mainPosition)->with('translations')->orderBy('position')->get();
     }
 
 
@@ -128,22 +128,60 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
     {
         return self::FILES_PATH . '/' . $this->id . '/';
     }
-    public static function getRequestData($request)
+    public static function getRequestData($request): array
     {
-        // TODO: Implement getRequestData() method.
+        $splitPath = explode("-", decrypt($request->path));
+        if (is_null($request->position)) {
+            $request['position'] = self::generatePosition($request);
+        }
+
+        $data = [
+            'module'        => $splitPath[0],
+            'model'         => $splitPath[1],
+            'model_id'      => $splitPath[2],
+            'main_position' => $request->main_position,
+            'position'      => $request->position,
+            'icon_set_id'   => $request->icon_set_id
+        ];
+
+        $data['active'] = true;
+        if ($request->has('active')) {
+            $data['active'] = filter_var($request->active, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if ($request->has('filename')) {
+            $data['filename'] = $request->filename;
+        }
+
+        return $data;
     }
-    public static function generatePosition($request)
+    public static function generatePosition($request): int
     {
-        // TODO: Implement generatePosition() method.
+        return 1;
+
+        //        $galleries = self::where('parent_type_id', $parentTypeId)->where('parent_id', $parentId)->where('main_position', $request->main_position)->orderBy('position', 'desc')->get();
+        //        if (count($galleries) < 1) {
+        //            return 1;
+        //        }
+        //        if (!$request->has('position') || is_null($request['position'])) {
+        //            return $galleries->first()->position + 1;
+        //        }
+        //
+        //        if ($request['position'] > $galleries->first()->position) {
+        //            return $galleries->first()->position + 1;
+        //        }
+        //
+        //        $galleriesUpdate = self::where('parent_type_id', $parentTypeId)->where('parent_id', $parentId)->where('main_position', $request->main_position)->where('position', '>=', $request['position'])->get();
+        //        self::updateGalleyPosition($galleriesUpdate, true);
+        //
+        //        return $request['position'];
     }
     public static function getLangArraysOnStore($data, $request, $languages, $modelId, $isUpdate)
     {
-        // TODO: Implement getLangArraysOnStore() method.
+        foreach ($languages as $language) {
+            $data[$language->code] = IconTranslation::getLanguageArray($language, $request, $modelId, $isUpdate);
+        }
 
-        //        foreach ($languages as $language) {
-        //            $data[$language->code] = TeamTranslation::getLanguageArray($language, $request, $modelId, $isUpdate);
-        //        }
-        //
-        //        return $data;
+        return $data;
     }
 }
