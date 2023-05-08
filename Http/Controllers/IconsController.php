@@ -15,13 +15,14 @@ class IconsController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
      * @return Renderable
      */
     public function index()
     {
         $data = AdminHelper::getInternalLinksUrls([]);
 
-        return view('icons::admin.index', $data);
+        return view('icons::admin.icons.index', $data);
     }
 
     public function getEncryptedPath(Request $request)
@@ -36,55 +37,63 @@ class IconsController extends Controller
 
         $modelClass = $splitPath[1];
         if (!class_exists($modelClass)) {
-            return view('icons::admin.error_show');
+            return view('icons::admin.icons.error_show');
         } else {
             $modelInstance = new $modelClass;
             $modelConstant = get_class($modelInstance) . '::ALLOW_CATALOGS';
             if (!defined($modelConstant) || !constant($modelConstant)) {
-                return view('icons::admin.error_show');
+                return view('icons::admin.icons.error_show');
             }
 
             $model = $modelClass::where('id', $splitPath[2])->first();
             if (is_null($model)) {
-                return view('icons::admin.error_show');
+                return view('icons::admin.icons.error_show');
             }
-            $languages         = LanguageHelper::getActiveLanguages();
+            $languages      = LanguageHelper::getActiveLanguages();
             $model['Icons'] = Icon::getCollections($model);
 
-            return view('icons::admin.show', ['moduleName' => $splitPath[0], 'modelPath' => $modelClass, 'model' => $model, 'languages' => $languages]);
+            return view('icons::admin.icons.show', ['moduleName' => $splitPath[0], 'modelPath' => $modelClass, 'model' => $model, 'languages' => $languages]);
         }
     }
 
 
     /**
      * Show the form for creating a new resource.
+     *
      * @return Renderable
      */
     public function create()
     {
-        return view('icons::create');
+        return view('icons::admin.icons.create', [
+            'languages'     => LanguageHelper::getActiveLanguages(),
+            'fileRulesInfo' => Icon::getUserInfoMessage()
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
+     *
      * @param Request $request
+     *
      * @return Renderable
      */
     public function store(Request $request, CommonControllerAction $action)
     {
-        $splitPath = explode("-", decrypt($request->path));
+        $splitPath  = explode("-", decrypt($request->path));
         $modelClass = $splitPath[1];
         if (!class_exists($modelClass)) {
-            return redirect()->back()->withErrors(['catalogs::admin.catalogs.warning_class_not_found']);
+            return redirect()->back()->withErrors(['icons::admin.icons.warning_class_not_found']);
         }
 
-        $catalog = $action->doSimpleCreate(Catalog::class, $request);
+        $catalog = $action->doSimpleCreate(Icon::class, $request);
         $catalog->storeAndAddNew($request);
     }
 
     /**
      * Show the specified resource.
+     *
      * @param int $id
+     *
      * @return Renderable
      */
     public function show($id)
@@ -94,18 +103,22 @@ class IconsController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     *
      * @param int $id
+     *
      * @return Renderable
      */
     public function edit($id)
     {
-        return view('icons::edit');
+        return view('icons::admin.icons.edit');
     }
 
     /**
      * Update the specified resource in storage.
+     *
      * @param Request $request
      * @param int $id
+     *
      * @return Renderable
      */
     public function update(Request $request, $id)
@@ -115,7 +128,9 @@ class IconsController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
      * @param int $id
+     *
      * @return Renderable
      */
     public function destroy($id)

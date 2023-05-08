@@ -24,12 +24,12 @@ use Modules\Icons\Http\Controllers\IconsController;
 Route::group(['prefix' => 'admin', 'middleware' => ['auth']], static function () {
     Route::group(['prefix' => 'icons'], static function () {
         Route::get('/', [IconsController::class, 'index'])->name('admin.icons.index');
-        Route::get('/create', [IconsController::class, 'create'])->name('admin.icons.create');
+        Route::get('/create/{path}', [IconsController::class, 'create'])->name('admin.icons.create');
         Route::post('/store', [IconsController::class, 'store'])->name('admin.icons.store');
         Route::get('to_many_pages', [IconsController::class, 'toManyPagesCreate'])->name('admin.icons.toManyPagesCreate');
         Route::post('/storeToManyPages', [IconsController::class, 'storeToManyPages'])->name('admin.icons.storeToManyPages');
         Route::post('/get-path', [IconsController::class, 'getEncryptedPath'])->name('admin.icons.manage.get-path');
-        Route::get('/load-catalog/{path}', [IconsController::class, 'loadIconsPage'])->name('admin.icons.manage.load-catalog');
+        Route::get('/load-icons/{path}', [IconsController::class, 'loadIconsPage'])->name('admin.icons.manage.load-catalog');
 
         Route::group(['prefix' => 'multiple'], static function () {
             Route::get('active/{active}', [IconsController::class, 'activeMultiple'])->name('admin.icons.active-multiple');
