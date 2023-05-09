@@ -44,7 +44,7 @@
                         ?>
                     <div id="{{$language->code}}" class="tab-pane fade in @if($language->code === config('default.app.language.code')) active @endif}}">
                         <div class="form-group @if($errors->has($langTitle)) has-error @endif">
-                            <label class="control-label p-b-10"><span class="text-purple">* </span> Заглавие (<span class="text-uppercase">{{$language->code}}</span>):</label>
+                            <label class="control-label p-b-10"><span class="text-purple">* </span> {{ __('admin.title') }} (<span class="text-uppercase">{{$language->code}}</span>):</label>
                             <input class="form-control" type="text" name="{{$langTitle}}" value="{{ old($langTitle) }}">
                             @if($errors->has($langTitle))
                                 <span class="help-block">{{ trans($errors->first($langTitle)) }}</span>
@@ -52,7 +52,7 @@
                         </div>
                         <div id="{{$language->code}}" class="tab-pane fade in @if($language->code === config('default.app.language.code')) active @endif}}">
                             <div class="form-group @if($errors->has($langShortDescr)) has-error @endif">
-                                <label class="control-label p-b-10">Кратко описание (<span class="text-uppercase">{{$language->code}}</span>):</label>
+                                <label class="control-label p-b-10">{{ __('admin.seo.description') }} (<span class="text-uppercase">{{$language->code}}</span>):</label>
                                 <input class="form-control" type="text" name="{{$langShortDescr}}" value="{{ old($langShortDescr) }}">
                                 @if($errors->has($langShortDescr))
                                     <span class="help-block">{{ trans($errors->first($langShortDescr)) }}</span>
@@ -61,7 +61,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="control-label">Вътрешен линк (<span class="text-uppercase">{{$language->code}}</span>):</label>
+                            <label class="control-label">{{ __('admin.common.intenal_link') }} (<span class="text-uppercase">{{$language->code}}</span>):</label>
                             <div>
                                 <select name="{{$langLink}}" class="form-control select2 select2-{{$language->code}}" style="width: 100%;">
                                     @include('admin.partials.on_create.select_tag_internal_links', ['language' => $language->code, 'internalLinks' => $internalLinks])
@@ -153,10 +153,9 @@
                                     }
                                 });
                             </script>
-                            <input type="hidden" id="pagesIds" name="pagesIds" value="">
+                            <input type="hidden" id="pagesIds" name="pagesIds" value="{{ old('pagesIds') }}">
                         </div>
                     </div>
-
                     <hr>
                     @include('admin.partials.on_create.active_checkbox')
                 </div>
