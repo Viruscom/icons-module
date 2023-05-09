@@ -21,7 +21,7 @@ use Modules\Icons\Http\Controllers\IconsController;
 use Modules\Icons\Http\Controllers\IconSets\IconSetController;
 
 /* Icons Admin */
-Route::group(['prefix' => 'admin', 'middleware' => ['auth']], static function () {
+Route::group(['prefix' => 'admins', 'middleware' => ['auth']], static function () {
     Route::group(['prefix' => 'icons'], static function () {
         Route::get('/', [IconsController::class, 'index'])->name('admin.icons.index');
         Route::post('/get-path', [IconsController::class, 'getEncryptedPath'])->name('admin.icons.manage.get-path');
