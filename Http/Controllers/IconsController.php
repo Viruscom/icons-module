@@ -18,6 +18,7 @@ use Illuminate\Routing\Controller;
 use Modules\Catalogs\Models\Catalog;
 use Modules\Catalogs\Models\MainCatalog;
 use Modules\Icons\Http\Requests\IconStoreRequest;
+use Modules\Icons\Http\Requests\IconStoreToManyPagesRequest;
 use Modules\Icons\Http\Requests\IconUpdateRequest;
 use Modules\Icons\Models\Icon;
 use Modules\Icons\Models\IconTranslation;
@@ -232,5 +233,21 @@ class IconsController extends Controller
         }
 
         return redirect()->back()->with('success-message', 'admin.common.successful_edit');
+    }
+
+    public function toManyPagesCreate()
+    {
+        $data = [
+            'languages'     => LanguageHelper::getActiveLanguages(),
+            'fileRulesInfo' => Icon::getUserInfoMessage()
+        ];
+        $data = AdminHelper::getInternalLinksUrls($data);
+
+        return view('icons::admin.icons.add_to_many_pages', $data);
+    }
+
+    public function storeToManyPages(IconStoreToManyPagesRequest $request)
+    {
+        dd($request->all());
     }
 }

@@ -18,7 +18,9 @@ class IconUpdateRequest extends FormRequest
     public function rules(): array
     {
         $this->trimInput();
-        $array = [];
+        $array = [
+            'image' => 'required'
+        ];
 
         foreach ($this->LANGUAGES as $language) {
             $array['title_' . $language->code] = 'required';
@@ -35,7 +37,9 @@ class IconUpdateRequest extends FormRequest
     }
     public function messages()
     {
-        $messages = [];
+        $messages = [
+            'image.required' => trans('icons::admin.icons.image_required')
+        ];
 
         foreach ($this->LANGUAGES as $language) {
             $messages['title_' . $language->code . '.required'] = 'Полето за заглавие (' . $language->code . ') е задължително';

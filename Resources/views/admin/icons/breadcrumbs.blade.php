@@ -7,7 +7,12 @@
         <li>
             <a href="{{ route('admin.icons.index') }}" class="text-black">@lang('icons::admin.icons.index')</a>
         </li>
-        @if(!is_null(Request::segment(4)) && url()->current() === route('admin.icons.create', ['path' => Request::segment(4)]))
+        @if(url()->current() === route('admin.icons.toManyPagesCreate'))
+            <li>
+                <i class="fa fa-angle-right"></i>
+                <a href="{{ route('admin.icons.toManyPagesCreate') }}" class="text-purple">@lang('icons::admin.icons.to_many_pages_create')</a>
+            </li>
+        @elseif(!is_null(Request::segment(4)) && url()->current() === route('admin.icons.create', ['path' => Request::segment(4)]))
             <li>
                 <i class="fa fa-angle-right"></i>
                 <a href="{{ route('admin.icons.create', ['path' => Request::segment(4)]) }}" class="text-purple">@lang('icons::admin.icons.create')</a>

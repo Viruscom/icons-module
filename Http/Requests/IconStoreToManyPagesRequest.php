@@ -5,7 +5,7 @@ namespace Modules\Icons\Http\Requests;
 use App\Helpers\LanguageHelper;
 use Illuminate\Foundation\Http\FormRequest;
 
-class IconStoreRequest extends FormRequest
+class IconStoreToManyPagesRequest extends FormRequest
 {
     public function __construct()
     {
@@ -19,7 +19,8 @@ class IconStoreRequest extends FormRequest
     {
         $this->trimInput();
         $array = [
-            'image' => 'required'
+            'image' => 'required',
+            'pagesIds' => 'required',
         ];
 
         foreach ($this->LANGUAGES as $language) {
@@ -38,7 +39,8 @@ class IconStoreRequest extends FormRequest
     public function messages()
     {
         $messages = [
-            'image.required' => trans('icons::admin.icons.image_required')
+            'image.required' => trans('icons::admin.icons.image_required'),
+            'pagesIds.required' => trans('icons::admin.icons.pages_ids_required'),
         ];
 
         foreach ($this->LANGUAGES as $language) {
