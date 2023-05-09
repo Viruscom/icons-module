@@ -17,6 +17,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Catalogs\Models\Catalog;
 use Modules\Catalogs\Models\MainCatalog;
+use Modules\Icons\Http\Requests\IconStoreRequest;
+use Modules\Icons\Http\Requests\IconUpdateRequest;
 use Modules\Icons\Models\Icon;
 use Modules\Icons\Models\IconTranslation;
 
@@ -100,7 +102,7 @@ class IconsController extends Controller
         }
     }
 
-    public function store(Request $request, CommonControllerAction $action)
+    public function store(IconStoreRequest $request, CommonControllerAction $action)
     {
         $splitPath  = explode("-", decrypt($request->path));
         $modelClass = $splitPath[1];
@@ -132,7 +134,7 @@ class IconsController extends Controller
         return view('icons::admin.icons.edit', $data);
     }
 
-    public function update($id, Request $request, CommonControllerAction $action): RedirectResponse
+    public function update($id, IconUpdateRequest $request, CommonControllerAction $action): RedirectResponse
     {
         $icon = Icon::whereId($id)->with('translations')->first();
         MainHelper::goBackIfNull($icon);
