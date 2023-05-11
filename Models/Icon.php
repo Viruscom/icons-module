@@ -62,7 +62,7 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
     {
         return Icon::where('model', get_class($parentModel))
             ->where('model_id', $parentModel->id)
-            ->where('main_position', $mainPosition)->with('translations')->orderBy('position')->get();
+            ->where('main_position', $mainPosition)->where('active', true)->with('translations')->orderBy('position')->get();
     }
 
 
@@ -161,24 +161,37 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
     }
     public static function generatePosition($request): int
     {
-        return 1;
+        $splitPath = explode("-", decrypt($request->path));
 
-        //        $galleries = self::where('parent_type_id', $parentTypeId)->where('parent_id', $parentId)->where('main_position', $request->main_position)->orderBy('position', 'desc')->get();
-        //        if (count($galleries) < 1) {
-        //            return 1;
-        //        }
-        //        if (!$request->has('position') || is_null($request['position'])) {
-        //            return $galleries->first()->position + 1;
-        //        }
-        //
-        //        if ($request['position'] > $galleries->first()->position) {
-        //            return $galleries->first()->position + 1;
-        //        }
-        //
-        //        $galleriesUpdate = self::where('parent_type_id', $parentTypeId)->where('parent_id', $parentId)->where('main_position', $request->main_position)->where('position', '>=', $request['position'])->get();
-        //        self::updateGalleyPosition($galleriesUpdate, true);
-        //
-        //        return $request['position'];
+        $icons = self::where('module', $splitPath[0])
+            ->where('model', $splitPath[1])
+            ->where('model_id', $splitPath[2])
+            ->where('main_position', $request->main_position)->orderBy('position', 'desc')->get();
+        if (count($icons) < 1) {
+            return 1;
+        }
+        if (!$request->has('position') || is_null($request['position'])) {
+            return $icons->first()->position + 1;
+        }
+
+        if ($request['position'] > $icons->first()->position) {
+            return $icons->first()->position + 1;
+        }
+
+        $iconsUpdate = self::where('module', $splitPath[0])
+            ->where('model', $splitPath[1])
+            ->where('model_id', $splitPath[2])
+            ->where('main_position', $request->main_position)->where('position', '>=', $request['position'])->get();
+        self::updateIconsPosition($iconsUpdate, true);
+
+        return $request['position'];
+    }
+    private static function updateIconsPosition($icons, $increment = true): void
+    {
+        foreach ($icons as $iconUpdate) {
+            $position = ($increment) ? $iconUpdate->position + 1 : $iconUpdate->position - 1;
+            $iconUpdate->update(['position' => $position]);
+        }
     }
     public static function getLangArraysOnStore($data, $request, $languages, $modelId, $isUpdate)
     {
