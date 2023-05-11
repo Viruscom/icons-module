@@ -4,12 +4,10 @@
 @extends('layouts.admin.app')
 @section('styles')
     <link href="{{ asset('admin/css/select2.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('admin/plugins/foundation-datepicker/datepicker.css') }}" rel="stylesheet"/>
 @endsection
 
 @section('scripts')
     <script src="{{ asset('admin/js/select2.min.js') }}"></script>
-    <script src="{{ asset('admin/plugins/foundation-datepicker/datepicker.js') }}"></script>
     <script>
         $(".select2").select2({language: "bg"});
 

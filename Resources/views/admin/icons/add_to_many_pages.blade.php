@@ -1,9 +1,8 @@
 @php
     use Modules\Icons\Models\Icon;
-@endphp
-@extends('layouts.admin.app')
+@endphp@extends('layouts.admin.app')
 @section('styles')
-    <link href="{{ asset('admin/assets/css/select2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('admin/assets/css/select2.min.css') }}" rel="stylesheet"/>
     <link href="{{ asset('admin/assets/css/multi-select.css') }}" media="screen" rel="stylesheet" type="text/css">
 @endsection
 @section('scripts')
@@ -38,9 +37,9 @@
             <div class="tab-content">
                 @foreach($languages as $language)
                         <?php
-                        $langTitle = 'title_' . $language->code;
+                        $langTitle      = 'title_' . $language->code;
                         $langShortDescr = 'short_description_' . $language->code;
-                        $langLink = 'url_' . $language->code;
+                        $langLink       = 'url_' . $language->code;
                         ?>
                     <div id="{{$language->code}}" class="tab-pane fade in @if($language->code === config('default.app.language.code')) active @endif}}">
                         <div class="form-group @if($errors->has($langTitle)) has-error @endif">
@@ -99,46 +98,53 @@
                         <label class="control-label col-md-3"><span class="text-purple">* </span>{{ __('admin.pages.index') }}:</label>
                         <div class="col-md-6">
                             <select multiple="multiple" id="my-select" name="">
-                                @include('admin.partials.on_create.select_tag_internal_links', ['language' => $language->code, 'internalLinks' => $internalLinks])
+                                @foreach($internalLinks as $keyModule => $module)
+                                    {{$keyModule}}
+                                    <optgroup label="{{ $module['name'] }}">
+                                        @foreach($module['links'] as $link)
+                                            <option value="{{$link->id}}" module="{{Str::plural($keyModule, 1)}}" model="{{ get_class($link) }}" model_id="{{ $link->id }}">{{ $link->title }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
                             </select>
                             <script src="{{ asset('admin/assets/js/jquery.multi-select.js') }}" type="text/javascript"></script>
                             <script>
-                                $(document).ready(function() {
+                                $(document).ready(function () {
                                     $('#my-select option[value=""]').remove();
 
                                     var pagesIds = [];
 
                                     $('#my-select').multiSelect({
-                                        afterSelect: function(values) {
-                                            values.forEach(function(value) {
-                                                var option = $('#my-select option[value="' + value + '"]');
-                                                var id = option.val();
-                                                var module = option.attr('module');
-                                                var module_id = option.attr('module_id');
-                                                var lang_code = option.attr('lang_code');
+                                        afterSelect: function (values) {
+                                            values.forEach(function (value) {
+                                                var option   = $('#my-select option[value="' + value + '"]');
+                                                var id       = option.val();
+                                                var module   = option.attr('module');
+                                                var model    = option.attr('model');
+                                                var model_id = option.attr('model_id');
 
                                                 // Добавяне на данните в масива pagesIds
                                                 pagesIds.push({
                                                     module: module,
-                                                    module_id: module_id,
-                                                    lang_code: lang_code
+                                                    model: model,
+                                                    model_id: model_id
                                                 });
 
                                                 // Актуализиране на скритото поле на формуляра
                                                 updateHiddenField();
                                             });
                                         },
-                                        afterDeselect: function(values) {
-                                            values.forEach(function(value) {
-                                                var option = $('#my-select option[value="' + value + '"]');
-                                                var id = option.val();
-                                                var module = option.attr('module');
-                                                var module_id = option.attr('module_id');
-                                                var lang_code = option.attr('lang_code');
+                                        afterDeselect: function (values) {
+                                            values.forEach(function (value) {
+                                                var option    = $('#my-select option[value="' + value + '"]');
+                                                var id        = option.val();
+                                                var module    = option.attr('module');
+                                                var model    = option.attr('model');
+                                                var model_id = option.attr('model_id');
 
                                                 // Премахване на данните от масива pagesIds
-                                                pagesIds = pagesIds.filter(function(page) {
-                                                    return page.module != module || page.module_id != module_id || page.lang_code != lang_code;
+                                                pagesIds = pagesIds.filter(function (page) {
+                                                    return page.module != module || page.model != model || page.model_id != model_id;
                                                 });
 
                                                 // Актуализиране на скритото поле на формуляра

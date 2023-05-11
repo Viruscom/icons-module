@@ -3,6 +3,7 @@
 namespace Modules\Icons\Http\Controllers;
 
 use App\Actions\CommonControllerAction;
+use App\Classes\FileHelper;
 use App\Helpers\AdminHelper;
 use App\Helpers\CacheKeysHelper;
 use App\Helpers\FileDimensionHelper;
@@ -11,10 +12,13 @@ use App\Helpers\MainHelper;
 use App\Http\Requests\CategoryPageUpdateRequest;
 use App\Models\CategoryPage\CategoryPage;
 use App\Models\CategoryPage\CategoryPageTranslation;
+use App\Models\FileDimension;
+use App\Models\Language;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Modules\Catalogs\Models\Catalog;
 use Modules\Catalogs\Models\MainCatalog;
 use Modules\Icons\Http\Requests\IconStoreRequest;
@@ -42,7 +46,6 @@ class IconsController extends Controller
         return encrypt($request->moduleName . '-' . $request->modelPath . '-' . $request->modelId);
     }
 
-
     public function loadIconsPage($path)
     {
         $splitPath = explode("-", decrypt($path));
@@ -52,7 +55,7 @@ class IconsController extends Controller
             return view('icons::admin.icons.error_show');
         } else {
             $modelInstance = new $modelClass;
-            $modelConstant = get_class($modelInstance) . '::ALLOW_CATALOGS';
+            $modelConstant = get_class($modelInstance) . '::ALLOW_ICONS';
             if (!defined($modelConstant) || !constant($modelConstant)) {
                 return view('icons::admin.icons.error_show');
             }
@@ -246,8 +249,25 @@ class IconsController extends Controller
         return view('icons::admin.icons.add_to_many_pages', $data);
     }
 
-    public function storeToManyPages(IconStoreToManyPagesRequest $request)
+    public function storeToManyPages(IconStoreToManyPagesRequest $request, CommonControllerAction $action)
     {
-        dd($request->all());
+        if ($request->hasFile('image')) {
+            $request->validate(['image' => FileDimensionHelper::getRules('Icons', 1)], FileDimensionHelper::messages('Icons', 1));
+        }
+
+        $data     = json_decode($request->pagesIds, true);
+        foreach ($data as $item) {
+            $request['path']        = encrypt($item['module'] . '-' . $item['model'] . '-' . $item['model_id']);
+            $request['position']    = Icon::generatePosition($request);
+            $request['module']      = $item['module'];
+            $request['model']       = $item['model'];
+            $request['model_id']    = $item['model_id'];
+            $request['icon_set_id'] = 0;
+            $icon                   = $action->doSimpleCreate(Icon::class, $request);
+
+            $icon->saveFile($request->file('image'));
+        }
+
+        return redirect('admin.icons.index')->with('success-message', 'admin.common.successful_create');
     }
 }
