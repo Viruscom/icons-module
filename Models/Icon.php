@@ -11,15 +11,8 @@ use App\Traits\Scopes;
 use App\Traits\StorageActions;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
-use Carbon\Carbon;
-use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Modules\Catalogs\Models\Catalog;
-use Modules\Team\Models\TeamDivision;
-use Modules\Team\Models\TeamTranslation;
 
 class Icon extends Model implements TranslatableContract, CommonModelInterface, ImageModelInterface
 {
@@ -34,7 +27,7 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
     const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_5 = 5;
     const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_6 = 6;
 
-    public static string $ICON_SYSTEM_IMAGE  = 'icon_img.png';
+    public static string $ICON_SYSTEM_IMAGE  = 'icons_1_image.png';
     public static string $ICON_RATIO         = '1/1';
     public static string $ICON_MIMES         = 'jpg,jpeg,png,gif';
     public static string $ICON_MAX_FILE_SIZE = '3000';
@@ -102,31 +95,6 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
     public static function getUserInfoMessage(): string
     {
         return FileDimensionHelper::getUserInfoMessage('Icons', 1);
-    }
-    public function getSystemImage(): string
-    {
-        return AdminHelper::getSystemImage(self::$ICON_SYSTEM_IMAGE);
-    }
-    public function setKeys($array): array
-    {
-        $array[1]['sys_image_name'] = trans('icons::admin.icons.index');
-        $array[1]['sys_image']      = self::$ICON_SYSTEM_IMAGE;
-        $array[1]['sys_image_path'] = AdminHelper::getSystemImage(self::$ICON_SYSTEM_IMAGE);
-        $array[1]['ratio']          = self::$ICON_RATIO;
-        $array[1]['mimes']          = self::$ICON_MIMES;
-        $array[1]['max_file_size']  = self::$ICON_MAX_FILE_SIZE;
-        $array[1]['file_rules']     = 'mimes:' . self::$ICON_MIMES . '|size:' . self::$ICON_MAX_FILE_SIZE . '|dimensions:ratio=' . self::$ICON_RATIO;
-
-        return $array;
-    }
-
-    public function getFilepath($filename): string
-    {
-        return $this->getFilesPath() . $filename;
-    }
-    public function getFilesPath(): string
-    {
-        return self::FILES_PATH . '/' . $this->id . '/';
     }
     public static function getRequestData($request): array
     {
@@ -200,5 +168,29 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
         }
 
         return $data;
+    }
+    public function setKeys($array): array
+    {
+        $array[1]['sys_image_name'] = trans('icons::admin.icons.index');
+        $array[1]['sys_image']      = self::$ICON_SYSTEM_IMAGE;
+        $array[1]['sys_image_path'] = AdminHelper::getSystemImage(self::$ICON_SYSTEM_IMAGE);
+        $array[1]['ratio']          = self::$ICON_RATIO;
+        $array[1]['mimes']          = self::$ICON_MIMES;
+        $array[1]['max_file_size']  = self::$ICON_MAX_FILE_SIZE;
+        $array[1]['file_rules']     = 'mimes:' . self::$ICON_MIMES . '|size:' . self::$ICON_MAX_FILE_SIZE . '|dimensions:ratio=' . self::$ICON_RATIO;
+
+        return $array;
+    }
+    public function getSystemImage(): string
+    {
+        return AdminHelper::getSystemImage(self::$ICON_SYSTEM_IMAGE);
+    }
+    public function getFilepath($filename): string
+    {
+        return $this->getFilesPath() . $filename;
+    }
+    public function getFilesPath(): string
+    {
+        return self::FILES_PATH . '/' . $this->id . '/';
     }
 }
