@@ -1,7 +1,6 @@
 @php
     use Modules\Icons\Models\Icon;
-@endphp
-@extends('layouts.admin.app')
+@endphp@extends('layouts.admin.app')
 @section('styles')
     <link href="{{ asset('admin/css/select2.min.css') }}" rel="stylesheet"/>
 @endsection
@@ -60,9 +59,9 @@
             <div class="tab-content">
                 @foreach($languages as $language)
                         <?php
-                        $langTitle = 'title_' . $language->code;
+                        $langTitle      = 'title_' . $language->code;
                         $langShortDescr = 'short_description_' . $language->code;
-                        $langLink = 'url_' . $language->code;
+                        $langLink       = 'url_' . $language->code;
                         ?>
                     @php
                         $iconTranslate = is_null($icon->translate($language->code)) ? $icon : $icon->translate($language->code);
@@ -86,14 +85,14 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="control-label">{{ __('admin.common.intenal_link') }} (<span class="text-uppercase">{{$language->code}}</span>) <span class="text-purple">{!! trans('admin.common.please_select') !!}</span>:</label>
-                            <div>
-                                <select name="{{'url_' . $language->code}}" class="form-control select2 select2-{{$language->code}}" style="width: 100%;">
-                                    @include('admin.partials.on_edit.select_tag_internal_links', ['oldFieldName' => 'url_' . $language->code, 'language' => $language->code, 'internalLinks' => $internalLinks, 'model' => $iconTranslate])
-                                </select>
-                            </div>
-                        </div>
+                        {{--                        <div class="form-group">--}}
+                        {{--                            <label class="control-label">{{ __('admin.common.intenal_link') }} (<span class="text-uppercase">{{$language->code}}</span>) <span class="text-purple">{!! trans('admin.common.please_select') !!}</span>:</label>--}}
+                        {{--                            <div>--}}
+                        {{--                                <select name="{{'url_' . $language->code}}" class="form-control select2 select2-{{$language->code}}" style="width: 100%;">--}}
+                        {{--                                    @include('admin.partials.on_edit.select_tag_internal_links', ['oldFieldName' => 'url_' . $language->code, 'language' => $language->code, 'internalLinks' => $internalLinks, 'model' => $iconTranslate])--}}
+                        {{--                                </select>--}}
+                        {{--                            </div>--}}
+                        {{--                        </div>--}}
                     </div>
                 @endforeach
             </div>

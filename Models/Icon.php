@@ -29,7 +29,7 @@ class Icon extends Model implements TranslatableContract, CommonModelInterface, 
 
     public static string $ICON_SYSTEM_IMAGE  = 'icons_1_image.png';
     public static string $ICON_RATIO         = '1/1';
-    public static string $ICON_MIMES         = 'jpg,jpeg,png,gif';
+    public static string $ICON_MIMES         = 'jpg,jpeg,png,gif,svg';
     public static string $ICON_MAX_FILE_SIZE = '3000';
 
     protected static $API_BASE_URL = 'https://common.citysofia.com';
