@@ -109,7 +109,9 @@
                 $request->validate(['image' => FileDimensionHelper::getRules('Icons', 1)], FileDimensionHelper::messages('Icons', 1));
             }
             $icon = $action->doSimpleCreate(Icon::class, $request);
-            $icon->storeAndAddNew($request);
+            if ($request->has('submitaddnew')) {
+                return redirect()->back()->with('success-message', 'admin.common.successful_create');
+            }
 
             return redirect()->route('admin.icons.manage.load-icons', ['path' => $request->path])->with('success-message', trans('admin.common.successful_create'));
         }
