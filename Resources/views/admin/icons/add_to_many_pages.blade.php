@@ -94,71 +94,116 @@
                         </div>
                     </div>
                     <hr>
-                    <div class="form-group @if($errors->has('file')) has-error @endif">
-                        <label class="control-label col-md-3"><span class="text-purple">* </span>{{ __('admin.pages.index') }}:</label>
-                        <div class="col-md-6">
-                            <select multiple="multiple" id="my-select" name="">
-                                @foreach($internalLinks as $keyModule => $module)
-                                    {{$keyModule}}
-                                    <optgroup label="{{ $module['name'] }}">
-                                        @foreach($module['links'] as $link)
-                                            <option value="{{$link->id}}" module="{{Str::plural($keyModule, 1)}}" model="{{ get_class($link) }}" model_id="{{ $link->id }}">{{ $link->title }}</option>
-                                        @endforeach
-                                    </optgroup>
-                                @endforeach
-                            </select>
-                            <script src="{{ asset('admin/assets/js/jquery.multi-select.js') }}" type="text/javascript"></script>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <h4><span class="text-purple">* </span>{{ __('admin.pages.index') }}:</h4>
+                            <div class="icons-to-many-pages-wrapper">
+                                <div class="first">
+                                    @foreach($internalLinks as $keyModule => $module)
+                                        <div class="group">
+                                            <div class="group-head"><span class="name">{{ $module['name'] }}</span> <span class="add-all pull-right">Добави всички</span></div>
+                                            @foreach($module['links'] as $link)
+                                                <div class="link" value="{{$link->id}}" module="{{Str::plural($keyModule, 1)}}" model="{{ get_class($link) }}" model_id="{{ $link->id }}">{{ $link->title }}</div>
+                                            @endforeach
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="second">
+
+                                </div>
+                            </div>
+
                             <script>
                                 $(document).ready(function () {
-                                    $('#my-select option[value=""]').remove();
-
                                     var pagesIds = [];
 
-                                    $('#my-select').multiSelect({
-                                        afterSelect: function (values) {
-                                            values.forEach(function (value) {
-                                                var option   = $('#my-select option[value="' + value + '"]');
-                                                var id       = option.val();
-                                                var module   = option.attr('module');
-                                                var model    = option.attr('model');
-                                                var model_id = option.attr('model_id');
+                                    // Функция за актуализиране на скритото поле
+                                    function updateHiddenField() {
+                                        $('#pagesIds').val(JSON.stringify(pagesIds));
+                                    }
 
-                                                // Добавяне на данните в масива pagesIds
-                                                pagesIds.push({
-                                                    module: module,
-                                                    model: model,
-                                                    model_id: model_id
-                                                });
-
-                                                // Актуализиране на скритото поле на формуляра
-                                                updateHiddenField();
-                                            });
-                                        },
-                                        afterDeselect: function (values) {
-                                            values.forEach(function (value) {
-                                                var option    = $('#my-select option[value="' + value + '"]');
-                                                var id        = option.val();
-                                                var module    = option.attr('module');
-                                                var model    = option.attr('model');
-                                                var model_id = option.attr('model_id');
-
-                                                // Премахване на данните от масива pagesIds
-                                                pagesIds = pagesIds.filter(function (page) {
-                                                    return page.module != module || page.model != model || page.model_id != model_id;
-                                                });
-
-                                                // Актуализиране на скритото поле на формуляра
-                                                updateHiddenField();
-                                            });
-                                        }
+                                    // Клик върху връзка в първия div
+                                    $('.first .link').click(function () {
+                                        moveLinkToSecond($(this));
                                     });
 
-                                    function updateHiddenField() {
-                                        // Актуализиране на стойността на скритото поле на формуляра
-                                        $('#pagesIds').val(JSON.stringify(pagesIds));
+                                    // Клик върху .add-all в първия div
+                                    $('.first .add-all').click(function () {
+                                        var group = $(this).parent().siblings('.link');
+                                        group.each(function () {
+                                            moveLinkToSecond($(this));
+                                        });
+                                    });
+
+                                    // Клик върху връзка във втория div
+                                    $('.second').on('click', '.link', function () {
+                                        moveLinkToFirst($(this));
+                                    });
+
+                                    // Клик върху .remove-all във втория div
+                                    $('.second').on('click', '.remove-all', function () {
+                                        var group = $(this).parent().siblings('.link');
+                                        group.each(function () {
+                                            moveLinkToFirst($(this));
+                                        });
+                                    });
+
+                                    function moveLinkToSecond(link) {
+                                        var groupHeadText = link.siblings('.group-head').find('.name').text();
+                                        var targetGroup   = $('.second .group-head .name:contains("' + groupHeadText + '")').parent().parent();
+
+                                        if (targetGroup.length === 0) {
+                                            // Ако не съществува group-head за модула във втория div - създаваме нова група
+                                            targetGroup = $('<div class="group"></div>');
+                                            targetGroup.append('<div class="group-head"><span class="name">' + groupHeadText + '</span> <span class="remove-all pull-right">Премахни всички</span></div>');
+                                            $('.second').append(targetGroup);
+                                        }
+
+                                        link.appendTo(targetGroup); // Преместване на връзката в целевата група
+                                        var module   = link.attr('module');
+                                        var model    = link.attr('model');
+                                        var model_id = link.attr('model_id');
+                                        pagesIds.push({
+                                            module: module,
+                                            model: model,
+                                            model_id: model_id
+                                        });
+                                        updateHiddenField();
+                                    }
+
+                                    function moveLinkToFirst(link) {
+                                        var groupHeadText = link.siblings('.group-head').find('.name').text();
+                                        var targetGroup   = $('.first .group-head .name:contains("' + groupHeadText + '")').parent().parent();
+
+                                        if (targetGroup.length === 0) {
+                                            // Ако не съществува group-head за модула в първия div - създаваме нова група
+                                            targetGroup = $('<div class="group"></div>');
+                                            targetGroup.append('<div class="group-head"><span class="name">' + groupHeadText + '</span> <span class="add-all pull-right">Добави всички</span></div>');
+                                            $('.first').append(targetGroup);
+                                        }
+
+                                        link.appendTo(targetGroup); // Преместване на връзката в целевата група
+                                        var module   = link.attr('module');
+                                        var model    = link.attr('model');
+                                        var model_id = link.attr('model_id');
+
+                                        // Премахване на данните от масива pagesIds
+                                        pagesIds = pagesIds.filter(function (page) {
+                                            return page.module != module || page.model != model || page.model_id != model_id;
+                                        });
+
+                                        // Проверка дали има други връзки със същата group-head във втория div
+                                        var sameGroupLinks = targetGroup.children('.link');
+                                        if (sameGroupLinks.length === 0) {
+                                            // Ако няма други връзки от същата група - премахваме групата
+                                            targetGroup.remove();
+                                        }
+
+                                        updateHiddenField();
                                     }
                                 });
                             </script>
+
                             <input type="hidden" id="pagesIds" name="pagesIds" value="{{ old('pagesIds') }}">
                         </div>
                     </div>

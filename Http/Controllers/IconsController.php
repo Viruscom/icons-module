@@ -258,6 +258,6 @@
                 $icon->saveFile($request->file('image'));
             }
 
-            return redirect('admin.icons.index')->with('success-message', 'admin.common.successful_create');
+            return redirect()->route('admin.icons.index')->with('success-message', 'admin.common.successful_create');
         }
     }
