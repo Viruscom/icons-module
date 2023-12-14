@@ -97,6 +97,11 @@
                     <div class="form-group">
                         <div class="col-md-12">
                             <h4><span class="text-purple">* </span>{{ __('admin.pages.index') }}:</h4>
+                            <div class="form-group">
+                                <div class="col-md-6">
+                                    <input type="text" id="searchBox" placeholder="Търсене..." class="form-control" style="margin: 5px;">
+                                </div>
+                            </div>
                             <div class="icons-to-many-pages-wrapper">
                                 <div class="first">
                                     @foreach($internalLinks as $keyModule => $module)
@@ -115,6 +120,21 @@
 
                             <script>
                                 $(document).ready(function () {
+                                    $("#searchBox").keyup(function () {
+                                        var value = $(this).val().toLowerCase();
+
+                                        $(".first .link").filter(function () {
+                                            var match = $(this).text().toLowerCase().indexOf(value) > -1;
+                                            $(this).toggle(match);
+                                            return match;
+                                        }).parent().show();
+
+                                        $(".first .group").each(function () {
+                                            var hasVisibleLinks = $(this).find(".link:visible").length > 0;
+                                            $(this).toggle(hasVisibleLinks);
+                                        });
+                                    });
+
                                     var pagesIds = [];
 
                                     // Функция за актуализиране на скритото поле
