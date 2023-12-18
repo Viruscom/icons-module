@@ -107,12 +107,13 @@
                                     @foreach($internalLinks as $keyModule => $module)
                                         <div class="group">
                                             <div class="group-head"><span class="name">{{ $module['name'] }}</span> <span class="add-all pull-right">Добави всички</span></div>
-                                            @foreach($module['links'] as $link)
-                                                <div class="link" value="{{$link->id}}" module="{{Str::plural($keyModule, 1)}}" model="{{ get_class($link) }}" model_id="{{ $link->id }}">{{ $link->title }}</div>
+                                            @foreach($module['links'] as $index => $link)
+                                                <div class="link" value="{{$link->id}}" module="{{Str::plural($keyModule, 1)}}" model="{{ get_class($link) }}" model_id="{{ $link->id }}" data-index="{{ $index }}">{{ $link->title }}</div>
                                             @endforeach
                                         </div>
                                     @endforeach
                                 </div>
+
                                 <div class="second">
 
                                 </div>
@@ -137,17 +138,14 @@
 
                                     var pagesIds = [];
 
-                                    // Функция за актуализиране на скритото поле
                                     function updateHiddenField() {
                                         $('#pagesIds').val(JSON.stringify(pagesIds));
                                     }
 
-                                    // Клик върху връзка в първия div
                                     $('.first .link').click(function () {
                                         moveLinkToSecond($(this));
                                     });
 
-                                    // Клик върху .add-all в първия div
                                     $('.first .add-all').click(function () {
                                         var group = $(this).parent().siblings('.link');
                                         group.each(function () {
@@ -155,31 +153,34 @@
                                         });
                                     });
 
-                                    // Клик върху връзка във втория div
                                     $('.second').on('click', '.link', function () {
                                         moveLinkToFirst($(this));
                                     });
 
-                                    // Клик върху .remove-all във втория div
                                     $('.second').on('click', '.remove-all', function () {
                                         var group = $(this).parent().siblings('.link');
                                         group.each(function () {
                                             moveLinkToFirst($(this));
                                         });
                                     });
+                                    var originalPosition = {};
 
                                     function moveLinkToSecond(link) {
-                                        var groupHeadText = link.siblings('.group-head').find('.name').text();
-                                        var targetGroup   = $('.second .group-head .name:contains("' + groupHeadText + '")').parent().parent();
+                                        var linkId        = link.attr('value');
+                                        var groupHeadText = link.closest('.group').find('.group-head .name').text();
+                                        var originalIndex = link.data('index');
+
+                                        originalPosition[linkId] = {index: originalIndex, groupName: groupHeadText};
+
+                                        var targetGroup = $('.second .group-head .name:contains("' + groupHeadText + '")').parent().parent();
 
                                         if (targetGroup.length === 0) {
-                                            // Ако не съществува group-head за модула във втория div - създаваме нова група
                                             targetGroup = $('<div class="group"></div>');
                                             targetGroup.append('<div class="group-head"><span class="name">' + groupHeadText + '</span> <span class="remove-all pull-right">Премахни всички</span></div>');
                                             $('.second').append(targetGroup);
                                         }
 
-                                        link.appendTo(targetGroup); // Преместване на връзката в целевата група
+                                        link.appendTo(targetGroup);
                                         var module   = link.attr('module');
                                         var model    = link.attr('model');
                                         var model_id = link.attr('model_id');
@@ -192,30 +193,51 @@
                                     }
 
                                     function moveLinkToFirst(link) {
-                                        var groupHeadText = link.siblings('.group-head').find('.name').text();
-                                        var targetGroup   = $('.first .group-head .name:contains("' + groupHeadText + '")').parent().parent();
+                                        var linkId = link.attr('value');
+                                        if (!originalPosition.hasOwnProperty(linkId)) {
+                                            return;
+                                        }
 
+                                        var originalData = originalPosition[linkId];
+                                        var targetGroup  = $('.first .group-head .name:contains("' + originalData.groupName + '")').parent().parent();
                                         if (targetGroup.length === 0) {
-                                            // Ако не съществува group-head за модула в първия div - създаваме нова група
                                             targetGroup = $('<div class="group"></div>');
-                                            targetGroup.append('<div class="group-head"><span class="name">' + groupHeadText + '</span> <span class="add-all pull-right">Добави всички</span></div>');
+                                            targetGroup.append('<div class="group-head"><span class="name">' + originalData.groupName + '</span> <span class="add-all pull-right">Добави всички</span></div>');
                                             $('.first').append(targetGroup);
                                         }
 
-                                        link.appendTo(targetGroup); // Преместване на връзката в целевата група
+                                        var existingLinks = targetGroup.find('.link');
+                                        var insertAtIndex = existingLinks.filter(function () {
+                                            return $(this).data('index') >= originalData.index;
+                                        }).first();
+
+                                        if (insertAtIndex.length) {
+                                            insertAtIndex.before(link);
+                                        } else {
+                                            targetGroup.append(link);
+                                        }
+
+                                        //
+                                        // var groupHeadText = link.siblings('.group-head').find('.name').text();
+                                        // var targetGroup   = $('.first .group-head .name:contains("' + groupHeadText + '")').parent().parent();
+                                        //
+                                        // if (targetGroup.length === 0) {
+                                        //     targetGroup = $('<div class="group"></div>');
+                                        //     targetGroup.append('<div class="group-head"><span class="name">' + groupHeadText + '</span> <span class="add-all pull-right">Добави всички</span></div>');
+                                        //     $('.first').append(targetGroup);
+                                        // }
+                                        //
+                                        // link.appendTo(targetGroup);
                                         var module   = link.attr('module');
                                         var model    = link.attr('model');
                                         var model_id = link.attr('model_id');
 
-                                        // Премахване на данните от масива pagesIds
                                         pagesIds = pagesIds.filter(function (page) {
                                             return page.module != module || page.model != model || page.model_id != model_id;
                                         });
 
-                                        // Проверка дали има други връзки със същата group-head във втория div
                                         var sameGroupLinks = targetGroup.children('.link');
                                         if (sameGroupLinks.length === 0) {
-                                            // Ако няма други връзки от същата група - премахваме групата
                                             targetGroup.remove();
                                         }
 
