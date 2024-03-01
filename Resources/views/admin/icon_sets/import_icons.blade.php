@@ -26,15 +26,15 @@
             <div class="form form-horizontal">
                 <div class="form-body">
                     <div class="form-group">
-                        <label class="control-label col-md-3">Избор на сет:</label>
+                        <label class="control-label col-md-3">{{ __('icons::admin.icons_sets.choose_set') }}:</label>
                         <div class="col-md-4">
                             <select class="form-control select2 icon-set-select" name="icon_set_id">
-                                <option value="0">--- Моля, изберете ---</option>
+                                <option value="0">{{ __('admin.common.please_select') }}</option>
                                 @foreach($iconSets as $key=>$iconSet)
                                     <option value="{{ $iconSet->id }}">{{ $iconSet->name }}</option>
                                 @endforeach
                             </select>
-                            <a href="#" class="download-icons-from-set btn btn-success m-t-10 hidden"><i class="fas fa-download"></i> Свали сет с иконки</a>
+                            <a href="#" class="download-icons-from-set btn btn-success m-t-10 hidden"><i class="fas fa-download"></i> {{ __('icons::admin.icons_sets.download_icon_set') }}</a>
                         </div>
                     </div>
                 </div>

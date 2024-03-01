@@ -78,7 +78,7 @@
             <div class="form form-horizontal">
                 <div class="form-body">
                     <div class="form-group">
-                        <label class="control-label col-md-3">Страница:</label>
+                        <label class="control-label col-md-3">{{ __('icons::admin.icons_sets.page') }}:</label>
                         <div class="col-md-4">
                             <select class="form-control" disabled>
                                 @foreach($navigations as $nav)
@@ -125,10 +125,10 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-md-3">Избор на сет:</label>
+                        <label class="control-label col-md-3">{{ __('icons::admin.icons_sets.choose_set') }}:</label>
                         <div class="col-md-4">
                             <select class="form-control select2 icon-set-select" name="icon_set_id">
-                                <option value="0">--- Моля, изберете ---</option>
+                                <option value="0">{{ __('admin.common.please_select') }}</option>
                                 @foreach($iconSets as $key=>$iconSet)
                                     <option value="{{ $iconSet->id }}">{{ $iconSet->name }}</option>
                                 @endforeach
@@ -140,7 +140,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-md-3">Основна позиция на иконата:</label>
+                        <label class="control-label col-md-3">{{ __('icons::admin.icons.main_position') }}:</label>
                         <div class="col-md-4">
                             <select class="form-control select2" name="main_position">
                                 <option value="0">{{ trans('administration_messages.additional_gallery_main_position_0') }}</option>
@@ -168,8 +168,8 @@
                 <div class="form-actions">
                     <div class="row">
                         <div class="col-md-offset-3 col-md-9">
-                            <button type="submit" name="submit" value="submit" class="btn save-btn margin-bottom-10"><i class="fas fa-save"></i> запиши</button>
-                            <a href="{{ url()->previous() }}" role="button" class="btn back-btn margin-bottom-10"><i class="fa fa-reply"></i> назад</a>
+                            <button type="submit" name="submit" value="submit" class="btn save-btn margin-bottom-10"><i class="fas fa-save"></i> {{ __('admin.common.save') }}</button>
+                            <a href="{{ url()->previous() }}" role="button" class="btn back-btn margin-bottom-10"><i class="fa fa-reply"></i> {{ __('admin.common.back') }}</a>
                         </div>
                     </div>
                 </div>

@@ -99,14 +99,14 @@
                             <h4><span class="text-purple">* </span>{{ __('admin.pages.index') }}:</h4>
                             <div class="form-group">
                                 <div class="col-md-6">
-                                    <input type="text" id="searchBox" placeholder="Търсене..." class="form-control" style="margin: 5px;">
+                                    <input type="text" id="searchBox" placeholder="{{ __('icons::admin.search') }}" class="form-control" style="margin: 5px;">
                                 </div>
                             </div>
                             <div class="icons-to-many-pages-wrapper">
                                 <div class="first">
                                     @foreach($internalLinks as $keyModule => $module)
                                         <div class="group">
-                                            <div class="group-head"><span class="name">{{ $module['name'] }}</span> <span class="add-all pull-right">Добави всички</span></div>
+                                            <div class="group-head"><span class="name">{{ $module['name'] }}</span> <span class="add-all pull-right">{{ __('icons::admin.add_all') }}</span></div>
                                             @foreach($module['links'] as $index => $link)
                                                 <div class="link" value="{{$link->id}}" module="{{Str::plural($keyModule, 1)}}" model="{{ get_class($link) }}" model_id="{{ $link->id }}" data-index="{{ $index }}">{{ $link->title }}</div>
                                             @endforeach
