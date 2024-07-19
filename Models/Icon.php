@@ -29,7 +29,7 @@
 
         public static string $ICON_SYSTEM_IMAGE  = 'icons_1_image.png';
         public static string $ICON_RATIO         = '1/1';
-        public static string $ICON_MIMES         = 'jpg,jpeg,png,gif,svg';
+        public static string $ICON_MIMES         = 'jpg,jpeg,png,gif,webp,svg';
         public static string $ICON_MAX_FILE_SIZE = '3000';
 
         protected static $API_BASE_URL = 'https://common.citysofia.com';
@@ -38,6 +38,7 @@
         public array $translatedAttributes = ['short_description'];
         protected    $table                = "icons";
         protected    $fillable             = ['module', 'model', 'model_id', 'icon_set_id', 'active', 'main_position', 'position', 'filename'];
+
         public static function getCollections($parentModel): array
         {
             return [
@@ -92,14 +93,17 @@
 
             return $response->getBody()->getContents();
         }
+
         public static function getFileRules(): string
         {
             return FileDimensionHelper::getRules('Icons', 1);
         }
+
         public static function getUserInfoMessage(): string
         {
             return FileDimensionHelper::getUserInfoMessage('Icons', 1);
         }
+
         public static function getRequestData($request): array
         {
             $splitPath = explode("-", decrypt($request->path));
@@ -131,6 +135,7 @@
 
             return $data;
         }
+
         public static function generatePosition($request): int
         {
             $splitPath = explode("-", decrypt($request->path));
@@ -158,6 +163,7 @@
 
             return $request['position'];
         }
+
         private static function updateIconsPosition($icons, $increment = true): void
         {
             foreach ($icons as $iconUpdate) {
@@ -165,6 +171,7 @@
                 $iconUpdate->update(['position' => $position]);
             }
         }
+
         public static function getLangArraysOnStore($data, $request, $languages, $modelId, $isUpdate)
         {
             foreach ($languages as $language) {
@@ -173,6 +180,7 @@
 
             return $data;
         }
+
         public function setKeys($array): array
         {
             $array[1]['sys_image_name'] = trans('icons::admin.icons.index');
@@ -185,14 +193,17 @@
 
             return $array;
         }
+
         public function getSystemImage(): string
         {
             return AdminHelper::getSystemImage(self::$ICON_SYSTEM_IMAGE);
         }
+
         public function getFilepath($filename): string
         {
             return $this->getFilesPath() . $filename;
         }
+
         public function getFilesPath(): string
         {
             return self::FILES_PATH . '/' . $this->id . '/';
