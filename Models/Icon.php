@@ -7,6 +7,7 @@
     use App\Interfaces\Models\CommonModelInterface;
     use App\Interfaces\Models\ImageModelInterface;
     use App\Traits\CommonActions;
+    use App\Traits\HasModelRatios;
     use App\Traits\Scopes;
     use App\Traits\StorageActions;
     use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -16,7 +17,7 @@
 
     class Icon extends Model implements TranslatableContract, CommonModelInterface, ImageModelInterface
     {
-        use Translatable, StorageActions, Scopes, CommonActions;
+        use Translatable, StorageActions, Scopes, CommonActions, HasModelRatios;
 
         public const FILES_PATH                           = "icons";
         const        ICONS_AFTER_DESCRIPTION              = 0;
@@ -27,10 +28,7 @@
         const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_5 = 5;
         const        ICONS_AFTER_ADDITIONAL_DESCRIPTION_6 = 6;
 
-        public static string $ICON_SYSTEM_IMAGE  = 'icons_1_image.png';
-        public static string $ICON_RATIO         = '1/1';
-        public static string $ICON_MIMES         = 'jpg,jpeg,png,gif,webp,svg';
-        public static string $ICON_MAX_FILE_SIZE = '3000';
+        public static string $ICON_SYSTEM_IMAGE = 'icons_1_image.png';
 
         protected static $API_BASE_URL = 'https://common.citysofia.com';
         protected static $API_TOKEN    = '$2y$10$fQjaM8pjZDY5qfsAQVjuK.Gg2QbnNNfilIFdxCU2dkBXpUULXJrom';
@@ -186,10 +184,11 @@
             $array[1]['sys_image_name'] = trans('icons::admin.icons.index');
             $array[1]['sys_image']      = self::$ICON_SYSTEM_IMAGE;
             $array[1]['sys_image_path'] = AdminHelper::getSystemImage(self::$ICON_SYSTEM_IMAGE);
-            $array[1]['ratio']          = self::$ICON_RATIO;
-            $array[1]['mimes']          = self::$ICON_MIMES;
-            $array[1]['max_file_size']  = self::$ICON_MAX_FILE_SIZE;
-            $array[1]['file_rules']     = 'mimes:' . self::$ICON_MIMES . '|size:' . self::$ICON_MAX_FILE_SIZE . '|dimensions:ratio=' . self::$ICON_RATIO;
+            $array[1]['field_name']     = 'icons';
+            $array[1]['ratio']          = self::getModelRatio('icons');
+            $array[1]['mimes']          = self::getModelMime('icons');
+            $array[1]['max_file_size']  = self::getModelMaxFileSize('icons');
+            $array[1]['file_rules']     = 'mimes:' . self::getModelMime('icons') . '|size:' . self::getModelMaxFileSize('icons') . '|dimensions:ratio=' . self::getModelRatio('icons');
 
             return $array;
         }
