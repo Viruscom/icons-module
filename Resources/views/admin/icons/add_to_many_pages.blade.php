@@ -108,7 +108,9 @@
                                         <div class="group">
                                             <div class="group-head"><span class="name">{{ $module['name'] }}</span> <span class="add-all pull-right">{{ __('icons::admin.icons.add_all') }}</span></div>
                                             @foreach($module['links'] as $index => $link)
-                                                <div class="link" value="{{$link->id}}" module="{{Str::plural($keyModule, 1)}}" model="{{ get_class($link) }}" model_id="{{ $link->id }}" data-index="{{ $index }}">{{ $link->title }}</div>
+                                                @if(is_object($link) && !is_null($link))
+                                                    <div class="link" value="{{$link->id}}" module="{{Str::plural($keyModule, 1)}}" model="{{ get_class($link) }}" model_id="{{ $link->id }}" data-index="{{ $index }}">{{ $link->title }}</div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     @endforeach
